@@ -52,7 +52,7 @@ const goToProfile = () => {
                     background-color="transparent" active-text-color="#f56c6c" router>
                     <el-menu-item index="/">首页</el-menu-item>
                     <el-menu-item index="/class">我的班级</el-menu-item>
-                    <el-menu-item index="/homework">我的作业</el-menu-item>
+                    <el-menu-item index="/task">我的作业</el-menu-item>
                     <el-menu-item index="/score">我的成绩</el-menu-item>
                     <el-menu-item index="/talk">讨论区</el-menu-item>
                     <el-menu-item index="/resource">资源共享</el-menu-item>
@@ -91,7 +91,7 @@ const goToProfile = () => {
     /* 固定顶栏在页面顶部 */
     top: 0;
     left: 0;
-    width: 100%;
+    width: 100vw;
     z-index: 1000;
     /* 确保顶栏在最前面 */
     display: flex;
@@ -128,6 +128,7 @@ const goToProfile = () => {
     display: flex;
     align-items: center;
     justify-content: flex-end;
+    padding-right: 30px;
 }
 
 .auth-buttons>.el-button {
