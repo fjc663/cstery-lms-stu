@@ -17,7 +17,9 @@ const task = ref<itask>({
     allow_late_submission: true,
     submission_format: '',
     images: JSON.parse('[]'), 
-    submitted: false
+    submitted: false,
+    score: null,
+    feedback: ''
 })
 
 // 作答信息

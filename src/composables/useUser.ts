@@ -1,7 +1,7 @@
 import { useUserInfoStore } from '@/stores/useUserInfoStore';
 import { userLoginAPI, userRegisterAPI, editPasswordAPI, getUserInfoAPI, updateUserInfoAPI } from '@/apis/userApi';
-import type { result, ieditPassword } from './interfaceType/commonInterface';
-import type { istudentInfo, ilogin, iregister } from './interfaceType/userInterface';
+import type { result } from './interfaceType/commonInterface';
+import type { istudentInfo, ilogin, iregister, ieditPassword } from './interfaceType/userInterface';
 import { ElMessage } from 'element-plus';
 import router from '@/router';
 import { ref } from 'vue';
@@ -18,6 +18,7 @@ const user = ref<istudentInfo>({
     phone: '',
     avatar: '',
     gender: 2,
+    birthdate: null,
     address: '',
     desc: '',
 });
@@ -78,9 +79,9 @@ const editPassword = async (form: ieditPassword) => {
         ElMessage.success('密码修改成功');
 
         form = {
-            oldPassword: '',
-            newPassword: '',
-            confirmPassword: ''
+            old_password: '',
+            new_password: '',
+            confirm_password: ''
         };
 
         logout();
@@ -102,9 +103,9 @@ const getUserInfo = async () => {
 }
 
 // 修改个人信息
-const updateUserInfo = async () => {
+const updateUserInfo = async (student: istudentInfo) => {
 
-    const res: result = await updateUserInfoAPI(user.value);
+    const res: result = await updateUserInfoAPI(student);
 
     if (res.code === 0) {
         ElMessage.error(res.msg);

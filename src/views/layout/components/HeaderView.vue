@@ -2,7 +2,7 @@
 import router from '@/router';
 import { useUserInfoStore } from '@/stores/useUserInfoStore';
 import { ref } from 'vue';
-import useUser from '@/composables/userUser';
+import useUser from '@/composables/useUser';
 
 // 判断是否显示登录注册按钮
 const useUserInfo = useUserInfoStore();
@@ -25,7 +25,7 @@ const toRegister = () => {
 }
 
 const goToProfile = () => {
-    router.push('/userInfo')
+    router.push('/personal')
 }
 
 
@@ -41,7 +41,7 @@ const goToProfile = () => {
                     <svg class="icon" aria-hidden="true">
                         <use xlink:href="#icon-yuanzi"></use>
                     </svg>
-                    CsteryLms-学生端
+                    Cstery ClassBridge-学生端
                 </div>
             </el-col>
 
@@ -53,9 +53,8 @@ const goToProfile = () => {
                     <el-menu-item index="/">首页</el-menu-item>
                     <el-menu-item index="/class">我的班级</el-menu-item>
                     <el-menu-item index="/task">我的作业</el-menu-item>
-                    <el-menu-item index="/score">我的成绩</el-menu-item>
-                    <el-menu-item index="/talk">讨论区</el-menu-item>
-                    <el-menu-item index="/resource">资源共享</el-menu-item>
+                    <el-menu-item index="/grade">我的成绩</el-menu-item>
+                    <el-menu-item index="/personal">个人中心</el-menu-item>
                 </el-menu>
             </el-col>
 

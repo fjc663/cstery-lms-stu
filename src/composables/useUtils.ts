@@ -1,5 +1,5 @@
 import router from '@/router';
-import { ElMessage } from 'element-plus';
+import { ElMessage, type UploadProps } from 'element-plus';
 
 // 复制到剪贴板的函数
 const copyToClipboard = async (text: string) => {
@@ -53,6 +53,46 @@ const goBack = () => {
     router.back();
 }
 
+// 上传图片前的钩子函数
+const beforeUpload: UploadProps['beforeUpload'] = (file: File) => {
+    const isJPGorPNG = file.type === 'image/jpeg' || file.type === 'image/png';
+    const isLt10M = file.size / 1024 / 1024 < 10;
+
+    if (!isJPGorPNG) {
+        ElMessage.error('上传图片只能是 JPG/PNG 格式!');
+        return false;
+    }
+
+    if (!isLt10M) {
+        ElMessage.error('上传图片大小不能超过 10MB!');
+        return false;
+    }
+
+    return true;
+};
+
+// 处理上传图片超出限制的情况
+const handleExceed = () => {
+    ElMessage.warning('最多只能上传10张图片');
+};
+
+// 根据出生日期计算年龄
+const calculateAge = (birthday: Date | string | null): string | number => {
+    if (!birthday) {
+        return '';
+    }
+
+    // 如果 `birthday` 是字符串，则尝试转换为 `Date`
+    const dateObj = birthday instanceof Date ? birthday : new Date(birthday);
+    if (isNaN(dateObj.getTime())) { // 确保转换成功
+        return '';
+    }
+
+    const ageDifMs: number = Date.now() - dateObj.getTime();
+    const ageDate: Date = new Date(ageDifMs);
+    return Math.abs(ageDate.getUTCFullYear() - 1970);
+};
+
 
 export default function () {
     return {
@@ -60,6 +100,9 @@ export default function () {
         formatDate,
         formattedDateTime,
         goBack,
-        isDueDateLaterThanNow
+        isDueDateLaterThanNow,
+        beforeUpload,
+        handleExceed,
+        calculateAge
     }
 }

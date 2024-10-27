@@ -5,9 +5,14 @@ const router = createRouter({
   routes: [
     {
       path: '/',
-      name: 'home',
+      name: 'layout',
       component: () => import('../views/layout/LayoutView.vue'),
       children: [
+        {
+          path: '',
+          name: 'home',
+          component: () => import('@/views/layout/components/HomeView.vue')
+        },
         {
           path: 'class',
           name: 'class',
@@ -41,7 +46,24 @@ const router = createRouter({
               component: () => import('@/views/task/components/taskDetailView.vue')
             },
           ]
-        }
+        },
+        {
+          path: '/personal',
+          name: 'personal',
+          component: () => import('@/views/user/PersonalCenter.vue'),
+          children: [
+            {
+              path: '',
+              name: 'userInfo',
+              component: () => import('@/views/user/components/UserInfoView.vue')
+            },
+            {
+              path: 'editPassword',
+              name: 'editPassword',
+              component: () => import('@/views/user/components/EditPassword.vue')
+            },
+          ]
+        },
       ]
     },
     {

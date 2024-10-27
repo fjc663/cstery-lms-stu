@@ -3,11 +3,13 @@ export interface itask {
     id: number,
     title: string,
     desc: string,
-    due_date: Date,
+    due_date: Date | null,
     allow_late_submission: boolean,
     submission_format: string,
     images: JSON,
-    submitted: boolean
+    submitted: boolean,
+    score: number | null,
+    feedback: string,
 }
 
 // 作业作答信息接口

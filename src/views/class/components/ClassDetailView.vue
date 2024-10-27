@@ -62,16 +62,28 @@ onMounted(async () => {
                         已提交
                     </el-tag>
 
-                    <el-tag v-else-if="!isDueDateLaterThanNow(task.due_date)" type="danger">
-                        已截止
-                    </el-tag>
-
                     <el-tag v-else type="warning">
                         未提交
                     </el-tag>
+
+                    <el-tag style="margin-left: 5px;" v-if="task.due_date && !isDueDateLaterThanNow(task.due_date)"
+                        type="danger">
+                        已截止
+                    </el-tag>
                 </h3>
-                <p class="task-desc"><strong>描述：</strong>{{ task.desc }}</p>
-                <p class="task-due-date"><strong>截止日期：</strong>{{ formatDate(task.due_date) }}</p>
+                <p class="task-desc">
+                    <strong>描述：</strong>
+                    <el-tooltip placement="top" effect="light" v-if="task.desc.length > 100"
+                        popper-class="custom-tooltip">
+                        <template #content>
+                            <div>{{ task.desc }}</div>
+                        </template>
+                        {{ task.desc.slice(0, 100) + '...' }}
+                    </el-tooltip>
+
+                    <span v-else>{{ task.desc }}</span>
+                </p>
+                <p class="task-due-date"><strong>截止日期：</strong>{{ task.due_date ? formatDate(task.due_date) : '无' }}</p>
                 <p class="task-late-submission"
                     :class="{ 'allowed': task.allow_late_submission, 'not-allowed': !task.allow_late_submission }">
                     <strong>是否允许迟交：</strong>{{ task.allow_late_submission ? '是' : '否' }}
@@ -92,9 +104,10 @@ onMounted(async () => {
                 <div class="footer-button">
                     <!-- 跳转作业页面按钮 -->
                     <el-button
-                        v-if="task.submitted && (task.allow_late_submission || isDueDateLaterThanNow(task.due_date))"
+                        v-if="task.submitted && (!task.due_date || task.allow_late_submission || isDueDateLaterThanNow(task.due_date))"
                         @click="goToSubmitPage(task.id)" class="edit-button">修改作业</el-button>
-                    <el-button v-else-if="task.allow_late_submission || isDueDateLaterThanNow(task.due_date)"
+                    <el-button
+                        v-else-if="!task.due_date || task.allow_late_submission || isDueDateLaterThanNow(task.due_date)"
                         @click="goToSubmitPage(task.id)" class="submit-button">提交作业</el-button>
                     <el-button v-else @click="goToSubmitPage(task.id)" class="view-button">查看提交</el-button>
                 </div>

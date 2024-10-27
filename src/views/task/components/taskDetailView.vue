@@ -14,12 +14,12 @@ import useDelete from '@/composables/useDelete';
 const { task, getTaskById, answer, getAnswerById, submitTask, editTask } = useTask();
 
 // 文件上传处理逻辑
-const { uploadTask } = useUpload();
+const { uploadAnswer } = useUpload();
 // 文件删除处理逻辑
-const { deleteTask } = useDelete();
+const { deleteAnswer } = useDelete();
 
 // 日期格式化函数
-const { formatDate, formattedDateTime, goBack, isDueDateLaterThanNow } = useUtils();
+const { formatDate, formattedDateTime, goBack, isDueDateLaterThanNow, beforeUpload, handleExceed } = useUtils();
 
 // 从路由获得作业ID
 const route = useRoute();
@@ -35,19 +35,19 @@ const filenames = ref<string[]>([]);
 const dialogImageUrl = ref<string>('');
 const dialogVisible = ref<boolean>(false);
 
-// 上传班级图片
-const onUploadTask = async (task: any) => {
+// 上传作答图片
+const onUploadAnswer = async (answer: any) => {
     // 设置表单数据
     const formData = new FormData();
-    formData.append('task_image_file', task.file);
+    formData.append('answer_image_file', answer.file);
 
     // 上传
-    const res: result = await uploadTask(formData);
+    const res: result = await uploadAnswer(formData);
 
     if (res.code === 1) {
 
         // 查找在 fileList 中对应的文件索引
-        const fileIndex = fileList.value.findIndex(item => item.uid === task.file.uid);
+        const fileIndex = fileList.value.findIndex(item => item.uid === answer.file.uid);
 
         if (fileIndex !== -1) {
             // 更新对应文件的信息
@@ -74,29 +74,6 @@ const handlePictureCardPreview: UploadProps['onPreview'] = (uploadFile) => {
     dialogImageUrl.value = uploadFile.url!;
     dialogVisible.value = true;
 }
-
-// 上传班级图片前的钩子函数
-const beforeTaskUpload: UploadProps['beforeUpload'] = (file: File) => {
-    const isJPGorPNG = file.type === 'image/jpeg' || file.type === 'image/png';
-    const isLt10M = file.size / 1024 / 1024 < 10;
-
-    if (!isJPGorPNG) {
-        ElMessage.error('上传图片只能是 JPG/PNG 格式!');
-        return false;
-    }
-
-    if (!isLt10M) {
-        ElMessage.error('上传图片大小不能超过 10MB!');
-        return false;
-    }
-
-    return true;
-};
-
-// 处理上传图片超出限制的情况
-const handleExceed = () => {
-    ElMessage.warning('最多只能上传10张图片');
-};
 
 // 提交作业
 const submitAssignment = async () => {
@@ -126,7 +103,7 @@ const submitAssignment = async () => {
     }
 
     // 删除上传但移除的图片
-    deleteTask(filenames.value)
+    deleteAnswer(filenames.value)
 
     if (code === 1) {
         // 提交后刷新页面
@@ -176,16 +153,17 @@ onMounted(async () => {
                     已提交
                 </el-tag>
 
-                <el-tag v-else-if="!isDueDateLaterThanNow(task.due_date)" type="danger">
-                    已截止
-                </el-tag>
-
                 <el-tag v-else type="warning">
                     未提交
                 </el-tag>
+
+                <el-tag style="margin-left: 5px;" v-if="task.due_date && !isDueDateLaterThanNow(task.due_date)"
+                    type="danger">
+                    已截止
+                </el-tag>
             </h3>
             <p class="task-desc"><strong>描述：</strong>{{ task.desc }}</p>
-            <p class="task-due-date"><strong>截止日期：</strong>{{ formatDate(task.due_date) }}</p>
+            <p class="task-due-date"><strong>截止日期：</strong>{{ task.due_date ? formatDate(task.due_date) : '无' }}</p>
             <p class="task-late-submission"
                 :class="{ 'allowed': task.allow_late_submission, 'not-allowed': !task.allow_late_submission }">
                 <strong>是否允许迟交：</strong>{{ task.allow_late_submission ? '是' : '否' }}
@@ -201,7 +179,22 @@ onMounted(async () => {
             <p v-if="task.submitted && answer.updated_at" class="task-update-date"><strong>最后一次提交时间：</strong>{{
                 formattedDateTime(answer.updated_at) }}</p>
 
-            <!-- 展示多张图片 -->
+            <p class="task-score"><strong>分数：</strong>{{ task.score ? task.score : '无' }}</p>
+            <p class="task-correct">
+                <strong>教师评价：</strong>
+                <span v-if="!task.feedback || task.feedback.length < 1">无</span>
+                <el-tooltip placement="top" effect="light" v-else-if="task.feedback.length > 100"
+                    popper-class="custom-tooltip">
+                    <template #content>
+                        <div>{{ task.feedback }}</div>
+                    </template>
+                    {{ task.feedback.slice(0, 100) + '...' }}
+                </el-tooltip>
+
+                <span v-else>{{ task.feedback }}</span>
+            </p>
+
+            <!-- 展示多张作业图片 -->
             <div v-if="task.images && Array.isArray(task.images)" class="image-gallery">
                 <el-image v-for="(image, index) in task.images" :key="index" :src="image" alt="作业图片" fit="cover"
                     :zoom-rate="1.2" :max-scale="7" :min-scale="0.2" :preview-src-list="task.images"
@@ -216,23 +209,26 @@ onMounted(async () => {
                 <!-- 作答标题 -->
                 <el-form-item label="作答标题" prop="title" :rules="[{ required: true, message: '作答标题不能为空', trigger: 'change' },
                 { min: 1, max: 100, message: '作答标题长度应为 1 到 100 个字符', trigger: 'blur' }]">
-                    <el-input :disabled="!(task.allow_late_submission || isDueDateLaterThanNow(task.due_date))"
+                    <el-input
+                        :disabled="!(!task.due_date || task.allow_late_submission || isDueDateLaterThanNow(task.due_date))"
                         v-model="answer.title" placeholder="请输入作答标题" />
                 </el-form-item>
 
                 <!-- 根据提交格式选择答案内容 -->
                 <el-form-item label="答案内容" prop="desc">
-                    <el-input :disabled="!(task.allow_late_submission || isDueDateLaterThanNow(task.due_date))"
+                    <el-input
+                        :disabled="!(!task.due_date || task.allow_late_submission || isDueDateLaterThanNow(task.due_date))"
                         type="textarea" v-model="answer.desc" placeholder="请输入答案" :rows="10" />
                 </el-form-item>
 
                 <el-form-item label="上传图片"
                     :rules="task.submission_format === 'img' ? [{ required: true, message: '请上传图片', trigger: 'change' }] : []">
 
-                    <el-upload :disabled="!(task.allow_late_submission || isDueDateLaterThanNow(task.due_date))"
+                    <el-upload
+                        :disabled="!(!task.due_date || task.allow_late_submission || isDueDateLaterThanNow(task.due_date))"
                         class="upload-demo" drag multiple :limit="10" v-model:file-list="fileList"
                         :on-exceed="handleExceed" list-type="picture-card" :on-preview="handlePictureCardPreview"
-                        :on-remove="handleRemove" :http-request="onUploadTask" :before-upload="beforeTaskUpload">
+                        :on-remove="handleRemove" :http-request="onUploadAnswer" :before-upload="beforeUpload">
                         <div class="el-upload__text">拖动图片到此处，或 <em>点击上传</em></div>
                         <template v-slot:tip>
                             <div class="el-upload__tip">最多上传10张小于10MB，格式为JPG/PNG的图片。</div>
@@ -248,7 +244,8 @@ onMounted(async () => {
 
                 <!-- 提交按钮 -->
                 <el-form-item>
-                    <el-button v-if="task.allow_late_submission || isDueDateLaterThanNow(task.due_date)"
+                    <el-button
+                        v-if="!task.due_date || task.allow_late_submission || isDueDateLaterThanNow(task.due_date)"
                         class="submit-button" type="primary" @click="submitAssignment">{{
                             task.submitted ? '保存修改'
                                 : '提交作业'
@@ -290,7 +287,9 @@ onMounted(async () => {
 .task-late-submission,
 .task-submission-format,
 .task-update-date,
-.task-create-date {
+.task-create-date,
+.task-score,
+.task-correct {
     font-size: 1em;
     /* 统一字体大小 */
     margin: 8px 0;
@@ -305,6 +304,11 @@ onMounted(async () => {
 
 .task-update-date {
     color: #0674bd;
+}
+
+.task-score {
+    font-weight: bold;
+    color: rgb(255, 2, 2);
 }
 
 strong {

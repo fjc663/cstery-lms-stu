@@ -49,12 +49,12 @@ onMounted(() => getClasses())
                                 已提交
                             </el-tag>
 
-                            <el-tag v-else-if="!isDueDateLaterThanNow(task.due_date)" type="danger">
-                                已截止
-                            </el-tag>
-
                             <el-tag v-else type="warning">
                                 未提交
+                            </el-tag>
+
+                            <el-tag style="margin-left: 5px;" v-if="task.due_date && !isDueDateLaterThanNow(task.due_date)" type="danger">
+                                已截止
                             </el-tag>
                         </h4>
 
@@ -71,9 +71,9 @@ onMounted(() => getClasses())
 
                         <!-- 跳转作业页面按钮 -->
                         <el-button
-                            v-if="task.submitted && (task.allow_late_submission || isDueDateLaterThanNow(task.due_date))"
+                            v-if="task.submitted && (!task.due_date || task.allow_late_submission || isDueDateLaterThanNow(task.due_date))"
                             @click="goToSubmitPage(task.id)" class="edit-button">去修改</el-button>
-                        <el-button v-else-if="task.allow_late_submission || isDueDateLaterThanNow(task.due_date)"
+                        <el-button v-else-if="!task.due_date || task.allow_late_submission || isDueDateLaterThanNow(task.due_date)"
                             @click="goToSubmitPage(task.id)" class="submit-button">去提交</el-button>
                         <el-button v-else @click="goToSubmitPage(task.id)" class="view-button">去查看</el-button>
                     </li>

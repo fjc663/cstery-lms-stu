@@ -4,9 +4,13 @@ import useClass from '@/composables/useClass';
 import useUtils from '@/composables/useUtils';
 import { ElMessage, ElMessageBox } from 'element-plus';
 import { useRouter } from 'vue-router';
+import useUser from '@/composables/useUser';
 
 
 const router = useRouter();
+
+// 用户数据处理逻辑
+const { user, getUserInfo } = useUser();
 
 // 班级处理逻辑
 const { classes, getClasses, clas, getClassByCode, joinClass, exitClass } = useClass();
@@ -32,6 +36,14 @@ const checkInviteCode = async () => {
 
 // 根据邀请码请求加入班级
 const onjoinclass = async () => {
+    // 校验是否完善个人信息
+    await getUserInfo();
+    if (!user.value.name) {
+        ElMessage.error('请先完善个人信息');
+        router.push('/personal');
+        return;
+    }
+
     await joinClass(inviteCode.value);
     showConfirmDialog.value = false;
     getClasses();
