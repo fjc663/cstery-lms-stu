@@ -21,3 +21,28 @@ export interface ianswer {
     created_at?: Date,
     updated_at?: Date
 }
+
+// 作业信息分页查询条件
+export interface itaskPageQuery {
+    page: number,
+    pageSize: number,
+    task_title?: string,
+    class_name?: string,
+    is_cut_off?: boolean | null
+}
+
+// 作业详细报告
+export interface itaskReport {
+    task_id: number,
+    task_title: string,
+    class_name: string,
+    due_date: Date,
+    score: number
+}
+
+// 作业图表报告数据
+export interface iReportChart {
+    completion_count: number,
+    not_completion_count: number,
+    score_list: number[]
+}

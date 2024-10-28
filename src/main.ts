@@ -12,6 +12,11 @@ import router from './router'
 
 const app = createApp(App)
 
+// 初始化阿里图标样式
+import '@/assets/csteryLmsIcon/iconfont.css'
+// 引入阿里巴巴图标库
+import '@/assets/csteryLmsIcon/iconfont.js'
+
 //注册插件
 app.use(Lazyload, {
     loading: "http://127.0.0.1:8080/imgs/loading.gif",  //指定加载中的图像
