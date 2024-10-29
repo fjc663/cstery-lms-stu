@@ -1,12 +1,12 @@
 # cstery-learn-hub
 
 ![Vue 3](https://img.shields.io/badge/Vue-3-brightgreen.svg)
-![Element Plus](https://img.shields.io/badge/Element--Plus-2.8.5-blue.svg)
+![Element Plus](https://img.shields.io/badge/Element--Plus-2.8.6-blue.svg)
 ![License](https://img.shields.io/badge/license-MIT-blue.svg)
 
 欢迎来到 **cstery-learn-hub**，这是一个 **学生端** 的学习平台。
 
-对应的后端项目: [https://github.com/fjc663/cstery-library-fastapi](https://github.com/fjc663/cstery-library-fastapi)
+对应的后端项目: [https://github.com/fjc663/cstery-lms-fastapi](https://github.com/fjc663/cstery-lms-fastapi)
 
 ---
 
