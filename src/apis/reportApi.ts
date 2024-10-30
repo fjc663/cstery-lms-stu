@@ -17,3 +17,9 @@ export function getChartDataApi(): any {
     })
 }
 
+// 请求首页图片
+export function getHomeImageApi(): any {
+    return http({
+        url: '/student/report/home/images'
+    })
+}

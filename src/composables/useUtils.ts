@@ -1,14 +1,18 @@
 import router from '@/router';
 import { ElMessage, type UploadProps } from 'element-plus';
+import useClipboard from 'vue-clipboard3';
 
+
+const { toClipboard } = useClipboard();
 // 复制到剪贴板的函数
 const copyToClipboard = async (text: string) => {
     try {
-        await navigator.clipboard.writeText(text);
+        await toClipboard(text);
         ElMessage.success('复制成功');
     } catch {
         ElMessage.error("复制失败");
     }
+
 };
 
 // 日期格式化函数

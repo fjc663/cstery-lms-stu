@@ -1,16 +1,15 @@
 <script lang="ts" setup>
+import useReport from '@/composables/useReport';
+import { computed, onMounted } from 'vue';
 import { ref } from 'vue';
 import { useRouter } from 'vue-router';
 
 const router = useRouter();
 
+const { homeImages, getHomeImage } = useReport();
+
 // 轮播图图片
-const carouselImages = ref([
-    'http://127.0.0.1:8080/imgs/lunbotu/stu1.png',
-    'http://127.0.0.1:8080/imgs/lunbotu/stu2.png',
-    'http://127.0.0.1:8080/imgs/lunbotu/stu3.png',
-    'http://127.0.0.1:8080/imgs/lunbotu/stu4.png',
-]);
+const carouselImages = computed(() => homeImages.value.filter(homeImage => homeImage.type === 0));
 
 // 快捷操作导航
 const quickAccess = ref([
@@ -21,16 +20,17 @@ const quickAccess = ref([
 ]);
 
 // 宣传图片
-const promotionImages = ref([
-    'http://127.0.0.1:8080/imgs/lunbotu/stu5.png',
-    'http://127.0.0.1:8080/imgs/lunbotu/stu6.png',
-]);
+// 宣传图片
+const promotionImages = computed(() => homeImages.value.filter(homeImage => homeImage.type === 1));
 
 
 // 导航到指定路由
 const navigateTo = (route: string) => {
     router.push(route);
 };
+
+// 初始化页面数据
+onMounted(() => getHomeImage())
 </script>
 
 <template>
@@ -38,7 +38,7 @@ const navigateTo = (route: string) => {
         <!-- 轮播图 -->
         <el-carousel height="400px" :interval="4000" arrow="always" type="card">
             <el-carousel-item v-for="(img, index) in carouselImages" :key="index">
-                <img :src="img" class="carousel-image" alt="轮播图" />
+                <img :src="img.url" class="carousel-image" alt="轮播图" />
             </el-carousel-item>
         </el-carousel>
 
@@ -61,7 +61,7 @@ const navigateTo = (route: string) => {
     <div class="promotion-images">
         <el-row :gutter="20">
             <el-col :span="24" v-for="(image, index) in promotionImages" :key="index">
-                <img :src="image" class="promotion-image" alt="宣传图片" />
+                <img :src="image.url" class="promotion-image" alt="宣传图片" />
             </el-col>
         </el-row>
     </div>
